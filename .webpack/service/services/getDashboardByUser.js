@@ -73,83 +73,103 @@ module.exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./services/dashboards.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./services/getDashboardByUser.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./config/config.js":
-/*!**************************!*\
-  !*** ./config/config.js ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/aaron/projects/playground/sls/express-app/config/config.js'\n    at Error (native)");
-
-/***/ }),
-
-/***/ "./services/dashboards.js":
-/*!********************************!*\
-  !*** ./services/dashboards.js ***!
-  \********************************/
+/***/ "./config/dbConfig.js":
+/*!****************************!*\
+  !*** ./config/dbConfig.js ***!
+  \****************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _config = __webpack_require__(/*! ../config/config */ "./config/config.js");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.dbConfig = undefined;
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+__webpack_require__(/*! source-map-support/register */ "source-map-support/register");
 
-var serverless = __webpack_require__(/*! serverless-http */ "serverless-http");
-var bodyParser = __webpack_require__(/*! body-parser */ "body-parser");
-var express = __webpack_require__(/*! express */ "express");
-var app = express();
+var dbConfig = exports.dbConfig = {
+  user: 'SA',
+  password: 'RTAFl33tR0x!',
+  server: 'localhost',
+  database: 'RTAStable_72'
+};
 
+/***/ }),
+
+/***/ "./services/getDashboardByUser.js":
+/*!****************************************!*\
+  !*** ./services/getDashboardByUser.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _regenerator = __webpack_require__(/*! babel-runtime/regenerator */ "babel-runtime/regenerator");
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(/*! babel-runtime/helpers/asyncToGenerator */ "babel-runtime/helpers/asyncToGenerator");
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+__webpack_require__(/*! source-map-support/register */ "source-map-support/register");
+
+var _dbConfig = __webpack_require__(/*! ../config/dbConfig */ "./config/dbConfig.js");
+
+var _serverlessHttp = __webpack_require__(/*! serverless-http */ "serverless-http");
+
+var _serverlessHttp2 = _interopRequireDefault(_serverlessHttp);
+
+var _bodyParser = __webpack_require__(/*! body-parser */ "body-parser");
+
+var _bodyParser2 = _interopRequireDefault(_bodyParser);
+
+var _express = __webpack_require__(/*! express */ "express");
+
+var _express2 = _interopRequireDefault(_express);
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var app = (0, _express2.default)();
 var sql = __webpack_require__(/*! mssql */ "mssql");
 
-app.use(bodyParser.json({ strict: false }));
+app.use(_bodyParser2.default.json({ strict: false }));
 
 // Get Dashboards endpoint
-// app.get('/dashboards/:userName', (req, res) => {
-
-//   async (dbConfig) {
-//     await sql.ConnectionError(dbConfig)
-//     const request = new sql.Request()
-//     request.input('user',sql.Char(20), userName)
-//     const result = await request.execute('hive_sp_getDashboardsByUser')
-//     console.log({result})
-//     sql.close()
-//     return res.json(result)
-//   }
-
-// })
-
-// Get Dashboards endpoint
-app.get('/dashboards', function (req, res) {
+app.get('/dashboards/:user', function (req, res) {
   var woot = function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dbConfig) {
-      var request, result;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(dbConfig) {
+      var request, response, result;
+      return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return sql.ConnectionError(dbConfig);
+              return sql.connect(dbConfig);
 
             case 2:
               request = new sql.Request();
 
-              request.input('user', sql.Char(20), userName);
+              request.input('user', sql.Char(20), req.params.user);
               _context.next = 6;
               return request.execute('hive_sp_getDashboardsByUser');
 
             case 6:
-              result = _context.sent;
+              response = _context.sent;
+              result = JSON.parse((0, _lodash.values)(response.recordset[0])[0]);
 
-              console.log({ result: result });
               sql.close();
               return _context.abrupt('return', res.json(result));
 
@@ -166,10 +186,32 @@ app.get('/dashboards', function (req, res) {
     };
   }();
 
-  woot(_config.dbConfig);
+  woot(_dbConfig.dbConfig);
 });
 
-module.exports.handler = serverless(app);
+module.exports.handler = (0, _serverlessHttp2.default)(app);
+
+/***/ }),
+
+/***/ "babel-runtime/helpers/asyncToGenerator":
+/*!*********************************************************!*\
+  !*** external "babel-runtime/helpers/asyncToGenerator" ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/helpers/asyncToGenerator");
+
+/***/ }),
+
+/***/ "babel-runtime/regenerator":
+/*!********************************************!*\
+  !*** external "babel-runtime/regenerator" ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/regenerator");
 
 /***/ }),
 
@@ -195,6 +237,17 @@ module.exports = require("express");
 
 /***/ }),
 
+/***/ "lodash":
+/*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("lodash");
+
+/***/ }),
+
 /***/ "mssql":
 /*!************************!*\
   !*** external "mssql" ***!
@@ -215,7 +268,18 @@ module.exports = require("mssql");
 
 module.exports = require("serverless-http");
 
+/***/ }),
+
+/***/ "source-map-support/register":
+/*!**********************************************!*\
+  !*** external "source-map-support/register" ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("source-map-support/register");
+
 /***/ })
 
 /******/ });
-//# sourceMappingURL=dashboards.js.map
+//# sourceMappingURL=getDashboardByUser.js.map

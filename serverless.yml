@@ -25,8 +25,12 @@ provider:
 
 functions:
  
-  getDashboards:
-    handler: services/dashboards.handler
+  getDashboardByUser:
+    handler: services/getDashboardByUser.handler
     events:
       - http: 'GET /dashboards/{proxy+}'
+  getAllDashboards:
+    handler: services/getAllDashboards.handler
+    events:
+      - http: 'GET /dashboards'
   

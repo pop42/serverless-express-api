@@ -23,10 +23,7 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
-            options: {
-              presets: ['latest']
-            }
+            loader: 'babel-loader'
           }
         ]
       }
@@ -34,7 +31,7 @@ module.exports = {
   },
   output: {
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '.webpack'),
+    path: path.join(__dirname, '../.webpack'),
     filename: '[name].js',
     sourceMapFilename: '[file].map'
   }
