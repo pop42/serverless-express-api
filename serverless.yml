@@ -1,16 +1,20 @@
 service: express-app
 
 plugins:
+  - serverless-webpack
   - serverless-offline #serverless-offline needs to be last in the list
 
 custom:
   tableName: 'users-table-${self:provider.stage}'
-  dynamodb:
-    start:
-      migrate: true
   defaultStage: dev
   profiles:
     dev: aaron
+  webpack:
+    webpackConfig: ./config/webpack.config.js
+    includeModules: true
+
+package:
+  individually: true
 
 provider:
   name: aws
@@ -20,13 +24,9 @@ provider:
   profile: ${self:custom.profiles.${self:provider.stage}}
 
 functions:
-  app:
-    handler: index.handler
-    events:
-      - http: ANY /
-      - http: 'ANY {proxy+}'
+ 
   getDashboards:
-    handler: index.handler
+    handler: services/dashboards.handler
     events:
       - http: 'GET /dashboards/{proxy+}'
   
