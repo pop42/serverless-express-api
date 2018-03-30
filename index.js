@@ -1,76 +1,34 @@
+'use strict'
 const serverless = require('serverless-http')
 const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
-const AWS = require('aws-sdk')
 
-const USERS_TABLE = process.env.USERS_TABLE
-
-const IS_OFFLINE = process.env.IS_OFFLINE
-
-let dynamoDb
-if (IS_OFFLINE === 'true') {
-  dynamoDb = new AWS.DynamoDB.DocumentClient({
-    region: 'localhost',
-    endpoint: 'http://localhost:8000'
-  })
-} else {
-  dynamoDb = new AWS.DynamoDB.DocumentClient()
-}
-
+const sql = require('mssql')
 app.use(bodyParser.json({ strict: false }))
 
 app.get('/', function (req, res) {
   res.send('Hello World!')
 })
 
-// Get User endpoint
-app.get('/users/:userId', function (req, res) {
-  const params = {
-    TableName: USERS_TABLE,
-    Key: {
-      userId: req.params.userId
-    }
-  }
+const config = {
+  user: 'SA',
+  password: 'RTAFl33tR0x!',
+  server: 'localhost',
+  database: 'RTAStable_72'
+}
 
-  dynamoDb.get(params, (error, result) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not get user' })
-    }
-    if (result.Item) {
-      const { userId, name } = result.Item
-      res.json({ userId, name })
-    } else {
-      res.status(404).json({ error: 'User not found' })
-    }
-  })
-})
-
-// Create User endpoint
-app.post('/users', function (req, res) {
-  const { userId, name } = req.body
-  if (typeof userId !== 'string') {
-    res.status(400).json({ error: '"userId" must be a string' })
-  } else if (typeof name !== 'string') {
-    res.status(400).json({ error: '"name" must be a string' })
-  }
-
-  const params = {
-    TableName: USERS_TABLE,
-    Item: {
-      userId: userId,
-      name: name
-    }
-  }
-
-  dynamoDb.put(params, error => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not create user' })
-    }
-    res.json({ userId, name })
-  })
+// Get Dashboards endpoint
+app.get('/dashboards', function (req, res) {
+  sql
+    .connect(config)
+    .then(function () {
+      return sql.query`select * from sysdshbd`
+    })
+    .then(function (result) {
+      sql.close()
+      res.json(result)
+    })
 })
 
 module.exports.handler = serverless(app)
